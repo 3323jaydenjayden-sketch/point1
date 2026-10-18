@@ -233,7 +233,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(255, 253, 249, 0.8);
+            background: rgba(255, 253, 249, 0.85);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -304,7 +304,7 @@
     <!-- Firebase SDK 模組與邏輯 -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc, arrayUnion, onSnapshot } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, arrayUnion, onSnapshot } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAc8vE2_lC2XVtL_kl9wXV3MEQXvNge3K0",
@@ -319,7 +319,7 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // 資料庫文件位置：我們使用 habits 集合底下的 my_card 文件
+        // 指定 Firestore 資料庫路徑：habits 集合 -> my_card 文件
         const docRef = doc(db, "habits", "my_card");
 
         const totalPointsEl = document.getElementById("totalPoints");
@@ -334,7 +334,7 @@
 
         const GRID_SIZE = 10;
 
-        // 初始化渲染 10 個格子
+        // 渲染 10 個印章格子
         function renderStampGrid(currentPoints) {
             stampGridEl.innerHTML = "";
             const remainder = currentPoints % GRID_SIZE;
@@ -364,7 +364,6 @@
             }
 
             historyListEl.innerHTML = "";
-            // 按照時間倒序排列（最新的在最上面）
             const sortedHistory = [...historyArray].reverse();
 
             sortedHistory.forEach(item => {
@@ -385,7 +384,7 @@
             return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
         }
 
-        // 即時監聽 Firestore 資料變更（只要手機或電腦有任何一方新增點數，畫面會同步更新）
+        // 即時監聽資料庫變更
         onSnapshot(docRef, async (docSnap) => {
             if (docSnap.exists()) {
                 const data = docSnap.data();
@@ -397,20 +396,20 @@
                 renderStampGrid(points);
                 renderHistory(history);
             } else {
-                // 如果雲端還沒有資料，初始化一份預設資料
+                // 若文件不存在，自動在雲端建立預設初始文件
                 await setDoc(docRef, {
                     totalPoints: 0,
                     history: []
-                });
+                }, { merge: true });
             }
             loadingEl.style.opacity = "0";
             setTimeout(() => loadingEl.style.display = "none", 300);
         }, (error) => {
             console.error("Firebase 連線錯誤: ", error);
-            loadingEl.textContent = "連線失敗，請檢查網路或 Firebase 設定";
+            loadingEl.textContent = "連線失敗，請確認 Firebase 安全規則設為允許讀寫。";
         });
 
-        // 提交增加點數
+        // 按下新增點數時自動建立/更新 Firebase
         addPointForm.addEventListener("submit", async (e) => {
             e.preventDefault();
             const reason = reasonInput.value.trim();
@@ -418,12 +417,11 @@
 
             if (!reason || isNaN(addPoints) || addPoints <= 0) return;
 
-            // 取得現在格式化時間
             const now = new Date();
             const timeStr = `${now.getFullYear()}/${String(now.getMonth() + 1).padStart(2, '0')}/${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
 
             try {
-                // 先取得目前文件以計算新點數
+                // 讀取當前資料
                 const docSnap = await getDoc(docRef);
                 const currentData = docSnap.exists() ? docSnap.data() : { totalPoints: 0, history: [] };
                 const newTotal = (currentData.totalPoints || 0) + addPoints;
@@ -434,18 +432,17 @@
                     time: timeStr
                 };
 
-                // 更新 Firestore
-                await updateDoc(docRef, {
+                // 使用 setDoc + merge: true，自動建立或覆蓋更新
+                await setDoc(docRef, {
                     totalPoints: newTotal,
                     history: arrayUnion(newRecord)
-                });
+                }, { merge: true });
 
-                // 清空輸入框
                 reasonInput.value = "";
                 pointsInput.value = "1";
             } catch (err) {
                 console.error("更新點數失敗: ", err);
-                alert("儲存失敗，請稍後再試！");
+                alert("寫入失敗，請檢查 Firebase Console 規則設定！");
             }
         });
     </script>
