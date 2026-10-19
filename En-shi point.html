@@ -3,25 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>我的習慣養成集點卡</title>
-    <!-- 🌟 加入 Favicon (網頁分頁圖示) 🌟 -->
-    <!-- 使用 SVG Emoji 圖示 (現代瀏覽器) -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💮</text></svg>">
-    <!-- 引入 Google Fonts 溫暖字體 -->
+    <title>🎃 萬聖節習慣養成集點卡</title>
+    
+    <!-- Favicon: 萬聖節南瓜圖示 -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎃</text></svg>">
+    
+    <!-- 引入 Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #FFFDF9;
-            --card-bg: #FFFFFF;
-            --primary-color: #FF8C42;
-            --primary-hover: #E07532;
-            --accent-color: #FFD166;
-            --text-color: #4A4A4A;
-            --text-light: #888888;
-            --border-color: #F3EFEA;
-            --grid-bg: #FAF6F0;
-            --grid-stamped: #FFF3EB;
-            --shadow: 0 10px 25px rgba(255, 140, 66, 0.08);
+            --bg-color: #1A1829; /* 暗夜紫黑 */
+            --card-bg: #262238; /* 深紫卡片 */
+            --primary-color: #FF7A00; /* 萬聖節南瓜橘 */
+            --primary-hover: #E06B00;
+            --accent-color: #A259FF; /* 魔法紫 */
+            --text-color: #F0ECFC;
+            --text-light: #A5A0B8;
+            --border-color: #3B3554;
+            --grid-bg: #1F1C2E;
+            --grid-stamped: #3A2312;
+            --shadow: 0 10px 25px rgba(255, 122, 0, 0.15);
         }
 
         * {
@@ -39,6 +40,7 @@
             flex-direction: column;
             align-items: center;
             padding: 30px 15px;
+            background-image: radial-gradient(circle at 50% 10%, #2A2440 0%, #1A1829 80%);
         }
 
         .container {
@@ -52,9 +54,10 @@
         }
 
         header h1 {
-            font-size: 1.8rem;
-            color: #D66826;
+            font-size: 2rem;
+            color: var(--primary-color);
             margin-bottom: 8px;
+            text-shadow: 0 0 10px rgba(255, 122, 0, 0.3);
         }
 
         header p {
@@ -62,7 +65,7 @@
             font-size: 0.95rem;
         }
 
-        /* 狀態卡片 */
+        /* 卡片通用樣式 */
         .card {
             background-color: var(--card-bg);
             border-radius: 20px;
@@ -94,7 +97,7 @@
             color: var(--primary-color);
         }
 
-        /* 增加點數表單 */
+        /* 表單與控制項 */
         .form-group {
             margin-bottom: 15px;
         }
@@ -104,6 +107,7 @@
             font-size: 0.9rem;
             font-weight: 500;
             margin-bottom: 6px;
+            color: var(--text-color);
         }
 
         .form-control {
@@ -114,12 +118,12 @@
             font-size: 1rem;
             outline: none;
             transition: border-color 0.3s;
-            background-color: #FAFAFA;
+            background-color: var(--grid-bg);
+            color: var(--text-color);
         }
 
         .form-control:focus {
             border-color: var(--primary-color);
-            background-color: #FFFFFF;
         }
 
         .btn {
@@ -143,7 +147,48 @@
             transform: scale(0.98);
         }
 
-        /* 集點格子區 (100格) */
+        /* 設定橫列 */
+        .setter-row {
+            display: grid;
+            grid-template-columns: 1fr 2fr auto;
+            gap: 10px;
+            align-items: end;
+        }
+
+        .btn-small {
+            padding: 12px 18px;
+            background-color: var(--accent-color);
+            white-space: nowrap;
+        }
+
+        .btn-small:hover {
+            background-color: #8C3BFF;
+        }
+
+        /* 當前目標顯示區 */
+        .reward-display-box {
+            background: linear-gradient(135deg, rgba(162, 89, 255, 0.15) 0%, rgba(255, 122, 0, 0.15) 100%);
+            border: 1px solid var(--accent-color);
+            border-radius: 12px;
+            padding: 12px 15px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .reward-display-box .title {
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        .reward-display-box .content {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        /* 集點格子區 */
         .stamp-section-title {
             font-size: 1.1rem;
             font-weight: 700;
@@ -151,13 +196,14 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            color: var(--primary-color);
         }
 
         .stamp-grid {
             display: grid;
-            grid-template-columns: repeat(10, 1fr);
-            gap: 6px;
-            margin-bottom: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+            gap: 8px;
+            margin-bottom: 10px;
             max-height: 350px;
             overflow-y: auto;
             padding: 5px;
@@ -166,13 +212,13 @@
         .stamp-cell {
             aspect-ratio: 1;
             background-color: var(--grid-bg);
-            border: 1px dashed #E5DCD0;
+            border: 1px dashed var(--border-color);
             border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.65rem;
-            color: #CCC;
+            font-size: 0.7rem;
+            color: var(--text-light);
             position: relative;
             transition: all 0.2s ease;
         }
@@ -185,7 +231,7 @@
         }
 
         .stamp-cell .stamp-icon {
-            font-size: 0.9rem;
+            font-size: 1rem;
         }
 
         /* 歷史紀錄 */
@@ -193,6 +239,7 @@
             font-size: 1.1rem;
             font-weight: 700;
             margin-bottom: 12px;
+            color: var(--primary-color);
         }
 
         .history-list {
@@ -206,7 +253,7 @@
             justify-content: space-between;
             align-items: center;
             padding: 10px 12px;
-            background-color: #FAFAFA;
+            background-color: var(--grid-bg);
             border-radius: 10px;
             margin-bottom: 8px;
             border: 1px solid var(--border-color);
@@ -235,7 +282,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(255, 253, 249, 0.85);
+            background: rgba(26, 24, 41, 0.9);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -245,20 +292,111 @@
             z-index: 999;
             transition: opacity 0.3s;
         }
+
+        /* 解鎖慶祝對話框 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-box {
+            background-color: var(--card-bg);
+            border: 2px solid var(--primary-color);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 0 30px rgba(255, 122, 0, 0.5);
+            transform: scale(0.8);
+            transition: transform 0.3s;
+        }
+
+        .modal-overlay.active .modal-box {
+            transform: scale(1);
+        }
+
+        .modal-box h2 {
+            color: var(--primary-color);
+            font-size: 1.6rem;
+            margin-bottom: 10px;
+        }
+
+        .modal-box .reward-text {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--accent-color);
+            margin: 15px 0;
+        }
+
+        @media (max-width: 500px) {
+            .setter-row {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
 
-    <div id="loading" class="loading-overlay">連線雲端資料庫中...</div>
+    <div id="loading" class="loading-overlay">👻 召喚萬聖節雲端資料庫中...</div>
+
+    <!-- 滿額獎勵解鎖對話框 -->
+    <div id="rewardModal" class="modal-overlay">
+        <div class="modal-box">
+            <h2>🎉 恭喜完成一輪目標！</h2>
+            <p style="color: var(--text-light);">您成功解鎖了本輪獎勵：</p>
+            <div class="reward-text" id="unlockedRewardText">看電影 1 次</div>
+            <button type="button" class="btn" onclick="closeRewardModal()">👻 開心領取</button>
+        </div>
+    </div>
 
     <div class="container">
         <header>
-            <h1>🌟 我的習慣養成集點卡</h1>
-            <p>累積好習慣，每天給自己一點鼓勵！</p>
+            <h1>🎃 萬聖節習慣集點卡 👻</h1>
+            <p>不給點就搗蛋！累積習慣解鎖獎勵！</p>
         </header>
+
+        <!-- 目標點數與獎勵設定卡片 -->
+        <div class="card">
+            <div class="setter-row">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="targetInput">🎯 每輪目標</label>
+                    <input type="number" id="targetInput" class="form-control" value="100" min="1" max="1000">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="rewardInput">🎁 解鎖獎勵名稱</label>
+                    <input type="text" id="rewardInput" class="form-control" placeholder="例如：看電影 1 次、大餐特餐">
+                </div>
+                <button type="button" id="setTargetBtn" class="btn btn-small">更新設定</button>
+            </div>
+        </div>
 
         <!-- 數據與增加點數面板 -->
         <div class="card">
+            <div class="reward-display-box">
+                <div>
+                    <div class="title">本輪解鎖目標：</div>
+                    <div class="content" id="currentRewardBadge">尚未設定獎勵</div>
+                </div>
+                <span style="font-size: 1.5rem;">🎁</span>
+            </div>
+
             <div class="stats-row">
                 <div class="stat-item">
                     <h3>目前總點數</h3>
@@ -273,30 +411,30 @@
             <form id="addPointForm">
                 <div class="form-group">
                     <label for="reasonInput">達成事項 / 習慣紀錄</label>
-                    <input type="text" id="reasonInput" class="form-control" placeholder="例如：認真練琴 30 分鐘" required>
+                    <input type="text" id="reasonInput" class="form-control" placeholder="例如：完成練習、沒有搗蛋" required>
                 </div>
                 <div class="form-group">
                     <label for="pointsInput">增加點數</label>
                     <input type="number" id="pointsInput" class="form-control" value="1" min="1" max="100" required>
                 </div>
-                <button type="submit" class="btn">✨ 增加點數與蓋章</button>
+                <button type="submit" class="btn">🎃 餵食南瓜點數</button>
             </form>
         </div>
 
-        <!-- 100格集點卡視覺 -->
+        <!-- 集點卡視覺區 -->
         <div class="card">
             <div class="stamp-section-title">
-                <span>🎯 本輪集點卡 (每滿 100 點為一輪)</span>
+                <span>🦇 本輪南瓜集點卡</span>
                 <span id="currentRoundBadge" style="font-size: 0.85rem; color: var(--text-light);">第 1 輪</span>
             </div>
             <div class="stamp-grid" id="stampGrid">
-                <!-- 動態生成 100 格 -->
+                <!-- 動態生成格子 -->
             </div>
         </div>
 
         <!-- 歷史紀錄 -->
         <div class="card history-section">
-            <h3>📜 點數變更紀錄</h3>
+            <h3>📜 魔法點數紀錄</h3>
             <div class="history-list" id="historyList">
                 <div style="text-align: center; color: var(--text-light); padding: 15px;">暫無紀錄</div>
             </div>
@@ -326,30 +464,36 @@
         const totalPointsEl = document.getElementById("totalPoints");
         const roundProgressEl = document.getElementById("roundProgress");
         const currentRoundBadgeEl = document.getElementById("currentRoundBadge");
+        const currentRewardBadgeEl = document.getElementById("currentRewardBadge");
         const stampGridEl = document.getElementById("stampGrid");
         const historyListEl = document.getElementById("historyList");
         const addPointForm = document.getElementById("addPointForm");
         const reasonInput = document.getElementById("reasonInput");
         const pointsInput = document.getElementById("pointsInput");
+        const targetInput = document.getElementById("targetInput");
+        const rewardInput = document.getElementById("rewardInput");
+        const setTargetBtn = document.getElementById("setTargetBtn");
         const loadingEl = document.getElementById("loading");
 
-        const GRID_SIZE = 100; // 每輪 100 格
+        let currentGridSize = 100;
+        let currentRewardName = "看電影 1 次";
+        let previousPoints = -1;
 
-        // 渲染 100 個印章格子 (10x10 排列)
-        function renderStampGrid(currentPoints) {
+        // 渲染印章格子
+        function renderStampGrid(currentPoints, gridSize) {
             stampGridEl.innerHTML = "";
-            const remainder = currentPoints % GRID_SIZE;
-            const currentRound = Math.floor(currentPoints / GRID_SIZE) + 1;
+            const remainder = currentPoints % gridSize;
+            const currentRound = Math.floor(currentPoints / gridSize) + 1;
             
             currentRoundBadgeEl.textContent = `第 ${currentRound} 輪`;
 
-            for (let i = 1; i <= GRID_SIZE; i++) {
+            for (let i = 1; i <= gridSize; i++) {
                 const cell = document.createElement("div");
                 cell.className = "stamp-cell";
                 
                 if (i <= remainder || (currentPoints > 0 && remainder === 0)) {
                     cell.classList.add("stamped");
-                    cell.innerHTML = `<span class="stamp-icon">💮</span>`;
+                    cell.innerHTML = `<span class="stamp-icon">🎃</span>`;
                 } else {
                     cell.innerHTML = `<span>${i}</span>`;
                 }
@@ -371,78 +515,4 @@
                 const div = document.createElement("div");
                 div.className = "history-item";
                 div.innerHTML = `
-                    <div class="history-info">
-                        <div class="reason">${escapeHtml(item.reason)}</div>
-                        <div class="time">${item.time}</div>
-                    </div>
-                    <div class="history-points">+${item.points} 點</div>
-                `;
-                historyListEl.appendChild(div);
-            });
-        }
-
-        function escapeHtml(str) {
-            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-        }
-
-        // 即時監聽資料庫變更
-        onSnapshot(docRef, async (docSnap) => {
-            if (docSnap.exists()) {
-                const data = docSnap.data();
-                const points = data.totalPoints || 0;
-                const history = data.history || [];
-
-                totalPointsEl.textContent = points;
-                roundProgressEl.textContent = `${points % GRID_SIZE} / ${GRID_SIZE}`;
-                renderStampGrid(points);
-                renderHistory(history);
-            } else {
-                await setDoc(docRef, {
-                    totalPoints: 0,
-                    history: []
-                }, { merge: true });
-            }
-            loadingEl.style.opacity = "0";
-            setTimeout(() => loadingEl.style.display = "none", 300);
-        }, (error) => {
-            console.error("Firebase 連線錯誤: ", error);
-            loadingEl.textContent = "連線失敗，請確認 Firebase 安全規則設為允許讀寫。";
-        });
-
-        // 按下新增點數時自動建立/更新 Firebase
-        addPointForm.addEventListener("submit", async (e) => {
-            e.preventDefault();
-            const reason = reasonInput.value.trim();
-            const addPoints = parseInt(pointsInput.value);
-
-            if (!reason || isNaN(addPoints) || addPoints <= 0) return;
-
-            const now = new Date();
-            const timeStr = `${now.getFullYear()}/${String(now.getMonth() + 1).padStart(2, '0')}/${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-
-            try {
-                const docSnap = await getDoc(docRef);
-                const currentData = docSnap.exists() ? docSnap.data() : { totalPoints: 0, history: [] };
-                const newTotal = (currentData.totalPoints || 0) + addPoints;
-
-                const newRecord = {
-                    reason: reason,
-                    points: addPoints,
-                    time: timeStr
-                };
-
-                await setDoc(docRef, {
-                    totalPoints: newTotal,
-                    history: arrayUnion(newRecord)
-                }, { merge: true });
-
-                reasonInput.value = "";
-                pointsInput.value = "1";
-            } catch (err) {
-                console.error("更新點數失敗: ", err);
-                alert("寫入失敗，請檢查 Firebase Console 規則設定！");
-            }
-        });
-    </script>
-</body>
-</html>
+                    <div class="history-
