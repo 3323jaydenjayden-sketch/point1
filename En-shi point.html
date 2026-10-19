@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎃 萬聖節習慣養成集點卡</title>
+    <title>🎃 萬聖節習慣養成集點卡 (my_card)</title>
     
     <!-- Favicon: 萬聖節南瓜圖示 -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎃</text></svg>">
@@ -459,8 +459,8 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // 修改這裡：對應圖片中的文件名稱 En-shi_card
-        const docRef = doc(db, "habits", "En-shi_card");
+        // 指定讀取 habits 集合底下的 my_card 文件
+        const docRef = doc(db, "habits", "my_card");
 
         const totalPointsEl = document.getElementById("totalPoints");
         const roundProgressEl = document.getElementById("roundProgress");
@@ -534,7 +534,7 @@
             document.getElementById("rewardModal").classList.remove("active");
         };
 
-        // 即時監聽資料庫變更
+        // 即時監聽 my_card 資料變更
         onSnapshot(docRef, async (docSnap) => {
             if (docSnap.exists()) {
                 const data = docSnap.data();
