@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎃 萬聖節習慣養成集點卡</title>
+    <title>🎃 萬聖節習慣養成集點卡 (my_card)</title>
     
     <!-- Favicon: 萬聖節南瓜圖示 -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎃</text></svg>">
@@ -459,6 +459,7 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
+        // 指定讀取 habits 集合底下的 my_card 文件
         const docRef = doc(db, "habits", "my_card");
 
         const totalPointsEl = document.getElementById("totalPoints");
@@ -515,4 +516,123 @@
                 const div = document.createElement("div");
                 div.className = "history-item";
                 div.innerHTML = `
-                    <div class="history-
+                    <div class="history-info">
+                        <div class="reason">${escapeHtml(item.reason)}</div>
+                        <div class="time">${item.time}</div>
+                    </div>
+                    <div class="history-points">+${item.points} 點</div>
+                `;
+                historyListEl.appendChild(div);
+            });
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+
+        window.closeRewardModal = function() {
+            document.getElementById("rewardModal").classList.remove("active");
+        };
+
+        // 即時監聽 my_card 資料變更
+        onSnapshot(docRef, async (docSnap) => {
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                const points = data.totalPoints || 0;
+                const history = data.history || [];
+                currentGridSize = data.targetGoal || 100;
+                currentRewardName = data.rewardName || "看電影 1 次";
+
+                targetInput.value = currentGridSize;
+                rewardInput.value = currentRewardName;
+                currentRewardBadgeEl.textContent = currentRewardName;
+
+                totalPointsEl.textContent = points;
+                roundProgressEl.textContent = `${points % currentGridSize} / ${currentGridSize}`;
+                renderStampGrid(points, currentGridSize);
+                renderHistory(history);
+
+                // 檢查是否剛好完成一輪滿額（跳出慶祝對話框）
+                if (previousPoints >= 0 && points > previousPoints) {
+                    const prevRound = Math.floor(previousPoints / currentGridSize);
+                    const newRound = Math.floor(points / currentGridSize);
+                    if (newRound > prevRound || (points > 0 && points % currentGridSize === 0)) {
+                        document.getElementById("unlockedRewardText").textContent = currentRewardName;
+                        document.getElementById("rewardModal").classList.add("active");
+                    }
+                }
+                previousPoints = points;
+            } else {
+                await setDoc(docRef, {
+                    totalPoints: 0,
+                    targetGoal: 100,
+                    rewardName: "看電影 1 次",
+                    history: []
+                }, { merge: true });
+            }
+            loadingEl.style.opacity = "0";
+            setTimeout(() => loadingEl.style.display = "none", 300);
+        }, (error) => {
+            console.error("Firebase 連線錯誤: ", error);
+            loadingEl.textContent = "連線失敗，請確認 Firebase 安全規則設為允許讀寫。";
+        });
+
+        // 修改目標點數與獎勵名稱
+        setTargetBtn.addEventListener("click", async () => {
+            const newTarget = parseInt(targetInput.value);
+            const newReward = rewardInput.value.trim() || "滿額獎勵";
+
+            if (isNaN(newTarget) || newTarget <= 0) {
+                alert("請輸入有效的目標點數！");
+                return;
+            }
+
+            try {
+                await setDoc(docRef, {
+                    targetGoal: newTarget,
+                    rewardName: newReward
+                }, { merge: true });
+                alert(`成功設定！每輪 ${newTarget} 點，解鎖獎勵：「${newReward}」`);
+            } catch (err) {
+                console.error("更新設定失敗: ", err);
+                alert("更新失敗，請檢查網路連線。");
+            }
+        });
+
+        // 提交增加點數
+        addPointForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const reason = reasonInput.value.trim();
+            const addPoints = parseInt(pointsInput.value);
+
+            if (!reason || isNaN(addPoints) || addPoints <= 0) return;
+
+            const now = new Date();
+            const timeStr = `${now.getFullYear()}/${String(now.getMonth() + 1).padStart(2, '0')}/${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+            try {
+                const docSnap = await getDoc(docRef);
+                const currentData = docSnap.exists() ? docSnap.data() : { totalPoints: 0, history: [] };
+                const newTotal = (currentData.totalPoints || 0) + addPoints;
+
+                const newRecord = {
+                    reason: reason,
+                    points: addPoints,
+                    time: timeStr
+                };
+
+                await setDoc(docRef, {
+                    totalPoints: newTotal,
+                    history: arrayUnion(newRecord)
+                }, { merge: true });
+
+                reasonInput.value = "";
+                pointsInput.value = "1";
+            } catch (err) {
+                console.error("更新點數失敗: ", err);
+                alert("寫入失敗，請檢查 Firebase Console 規則設定！");
+            }
+        });
+    </script>
+</body>
+</html>
