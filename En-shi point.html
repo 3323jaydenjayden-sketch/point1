@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎃 萬聖節習慣養成集點卡</title>
+    <title>🎃 萬聖節習慣養成集點卡 (En-shi_card)</title>
     
     <!-- Favicon: 萬聖節南瓜圖示 -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎃</text></svg>">
@@ -359,17 +359,17 @@
     <!-- 滿額獎勵解鎖對話框 -->
     <div id="rewardModal" class="modal-overlay">
         <div class="modal-box">
-            <h2>🎉 恭喜完成一輪目標！</h2>
+            <h2>🎉 恭喜達成新里程碑！</h2>
             <p style="color: var(--text-light);">您成功解鎖了本輪獎勵：</p>
-            <div class="reward-text" id="unlockedRewardText">看電影 1 次</div>
+            <div class="reward-text" id="unlockedRewardText">專屬獎勵</div>
             <button type="button" class="btn" onclick="closeRewardModal()">👻 開心領取</button>
         </div>
     </div>
 
     <div class="container">
         <header>
-            <h1>🎃 萬聖節習慣集點卡 👻</h1>
-            <p>不給點就搗蛋！累積習慣解鎖獎勵！</p>
+            <h1>🎃 恩熙的萬聖節集點卡 👻</h1>
+            <p>累積好習慣，點數持續向上累計！</p>
         </header>
 
         <!-- 目標點數與獎勵設定卡片 -->
@@ -381,7 +381,7 @@
                 </div>
                 <div class="form-group" style="margin-bottom: 0;">
                     <label for="rewardInput">🎁 解鎖獎勵名稱</label>
-                    <input type="text" id="rewardInput" class="form-control" placeholder="例如：看電影 1 次、大餐特餐">
+                    <input type="text" id="rewardInput" class="form-control" placeholder="例如：看電影 1 次、大餐">
                 </div>
                 <button type="button" id="setTargetBtn" class="btn btn-small">更新設定</button>
             </div>
@@ -399,7 +399,7 @@
 
             <div class="stats-row">
                 <div class="stat-item">
-                    <h3>目前總點數</h3>
+                    <h3>目前總累積點數</h3>
                     <div class="value" id="totalPoints">0</div>
                 </div>
                 <div class="stat-item">
@@ -411,20 +411,20 @@
             <form id="addPointForm">
                 <div class="form-group">
                     <label for="reasonInput">達成事項 / 習慣紀錄</label>
-                    <input type="text" id="reasonInput" class="form-control" placeholder="例如：完成練習、沒有搗蛋" required>
+                    <input type="text" id="reasonInput" class="form-control" placeholder="例如：完成練習、表現良好" required>
                 </div>
                 <div class="form-group">
                     <label for="pointsInput">增加點數</label>
                     <input type="number" id="pointsInput" class="form-control" value="1" min="1" max="100" required>
                 </div>
-                <button type="submit" class="btn">🎃 餵食南瓜點數</button>
+                <button type="submit" class="btn">🎃 累積南瓜點數</button>
             </form>
         </div>
 
         <!-- 集點卡視覺區 -->
         <div class="card">
             <div class="stamp-section-title">
-                <span>🦇 本輪南瓜集點卡</span>
+                <span>🦇 本輪南瓜集點卡 (累計制)</span>
                 <span id="currentRoundBadge" style="font-size: 0.85rem; color: var(--text-light);">第 1 輪</span>
             </div>
             <div class="stamp-grid" id="stampGrid">
@@ -459,7 +459,7 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // 修改這裡：對應圖片中的文件名稱 En-shi_card
+        // 專門讀取 En-shi_card 文件
         const docRef = doc(db, "habits", "En-shi_card");
 
         const totalPointsEl = document.getElementById("totalPoints");
@@ -477,10 +477,10 @@
         const loadingEl = document.getElementById("loading");
 
         let currentGridSize = 100;
-        let currentRewardName = "看電影 1 次";
+        let currentRewardName = "專屬獎勵";
         let previousPoints = -1;
 
-        // 渲染印章格子
+        // 渲染印章格子（累計制：用餘數或滿格顯示）
         function renderStampGrid(currentPoints, gridSize) {
             stampGridEl.innerHTML = "";
             const remainder = currentPoints % gridSize;
@@ -488,11 +488,14 @@
             
             currentRoundBadgeEl.textContent = `第 ${currentRound} 輪`;
 
+            // 如果總點數超過0且剛好整除，代表剛好完成滿額一輪，格子全滿
+            const stampedCount = (currentPoints > 0 && remainder === 0) ? gridSize : remainder;
+
             for (let i = 1; i <= gridSize; i++) {
                 const cell = document.createElement("div");
                 cell.className = "stamp-cell";
                 
-                if (i <= remainder || (currentPoints > 0 && remainder === 0)) {
+                if (i <= stampedCount) {
                     cell.classList.add("stamped");
                     cell.innerHTML = `<span class="stamp-icon">🎃</span>`;
                 } else {
@@ -541,22 +544,26 @@
                 const points = data.totalPoints || 0;
                 const history = data.history || [];
                 currentGridSize = data.targetGoal || 100;
-                currentRewardName = data.rewardName || "看電影 1 次";
+                currentRewardName = data.rewardName || "專屬獎勵";
 
                 targetInput.value = currentGridSize;
                 rewardInput.value = currentRewardName;
                 currentRewardBadgeEl.textContent = currentRewardName;
 
                 totalPointsEl.textContent = points;
-                roundProgressEl.textContent = `${points % currentGridSize} / ${currentGridSize}`;
+                
+                const remainder = points % currentGridSize;
+                const displayRemainder = (points > 0 && remainder === 0) ? currentGridSize : remainder;
+                roundProgressEl.textContent = `${displayRemainder} / ${currentGridSize}`;
+                
                 renderStampGrid(points, currentGridSize);
                 renderHistory(history);
 
-                // 檢查是否剛好完成一輪滿額（跳出慶祝對話框）
+                // 檢查是否跨越了新的整輪門檻，彈出慶祝視窗
                 if (previousPoints >= 0 && points > previousPoints) {
                     const prevRound = Math.floor(previousPoints / currentGridSize);
                     const newRound = Math.floor(points / currentGridSize);
-                    if (newRound > prevRound || (points > 0 && points % currentGridSize === 0)) {
+                    if (newRound > prevRound) {
                         document.getElementById("unlockedRewardText").textContent = currentRewardName;
                         document.getElementById("rewardModal").classList.add("active");
                     }
@@ -566,7 +573,7 @@
                 await setDoc(docRef, {
                     totalPoints: 0,
                     targetGoal: 100,
-                    rewardName: "看電影 1 次",
+                    rewardName: "專屬獎勵",
                     history: []
                 }, { merge: true });
             }
@@ -580,7 +587,7 @@
         // 修改目標點數與獎勵名稱
         setTargetBtn.addEventListener("click", async () => {
             const newTarget = parseInt(targetInput.value);
-            const newReward = rewardInput.value.trim() || "滿額獎勵";
+            const newReward = rewardInput.value.trim() || "專屬獎勵";
 
             if (isNaN(newTarget) || newTarget <= 0) {
                 alert("請輸入有效的目標點數！");
@@ -599,7 +606,7 @@
             }
         });
 
-        // 提交增加點數
+        // 提交增加點數（持續累計）
         addPointForm.addEventListener("submit", async (e) => {
             e.preventDefault();
             const reason = reasonInput.value.trim();
